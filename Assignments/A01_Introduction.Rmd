@@ -6,6 +6,7 @@ geometry: margin=2.54cm
 ---
 
 ## OVERVIEW
+x <- 1 + 2
 
 This exercise accompanies the introductory material in Environmental Data Analytics. 
 
