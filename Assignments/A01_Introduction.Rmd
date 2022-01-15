@@ -1,12 +1,14 @@
 ---
-title: "Assignment 1: Introduction"
-author: "Student Name"
-output: pdf_document
+title: 'Assignment 1: Introduction'
+author: "Lambert Ngenzi"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 geometry: margin=2.54cm
 ---
 
 ## OVERVIEW
-x <- 1 + 2
 
 This exercise accompanies the introductory material in Environmental Data Analytics. 
 
@@ -23,21 +25,21 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I have heard about the all fields because my younger brothers are both majoring in computer science. We often discuss about their homework or classes in the general sense. I had some experience in GIS during my undergraduate and even joined a R working group but never picked up any skills. As far as data analytics, I am more familiar with Excel, that's how I have managed previous classes where R were introduced and recommended. 
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: I am not a big code fan, so I have to say not much confidence but I hope to gain more confidence as the class progresses. 
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer:I am expecting this class to be a challenge but I am also very hopeful that my motivation and the support from instructors, TAs, and colleagues will keep me going in this class.
 
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: 
+> Answer: (https://github.com/lambertngenzi1/Environmental_Data_Analytics_2022)
 
 
