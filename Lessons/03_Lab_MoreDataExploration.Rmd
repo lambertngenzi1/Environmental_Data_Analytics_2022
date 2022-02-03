@@ -66,9 +66,9 @@ list1 <- list(name = "Maria", mynumbers = vector1, mymatrix = matrix1, age = 5.3
 list1[[2]]
 
 # Data Frames ----
-d <- c(1, 2, 3, 4) # What type of vector?
-e <- c("red", "white", "red", NA) # What type of vector?
-f <- c(TRUE, TRUE, TRUE, FALSE) # What type of vector?
+d <- c(1, 2, 3, 4) # What type of vector? numerical
+e <- c("red", "white", "red", NA) # What type of vector? character 
+f <- c(TRUE, TRUE, TRUE, FALSE) # What type of vector? logical vector 
 dataframe1 <- data.frame(d,e,f) #
 names(dataframe1) <- c("ID","Color","Passed"); View(dataframe1) # 
 
@@ -93,25 +93,36 @@ Question: In the R chunk below, write "dataframe1$". Press `tab` after you type 
 Find a ten-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. Create two vectors, one representing the high temperature on each of the ten days and one representing the low.
 
 ```{r}
-
+LowTemp <- c(30, 18, 26, 26, 19, 26, 26, 28,39, 44)
+LowTemp
+HighTemp <- c(58,39,41, 44,37,41,51,52,53,60)
+HighTemp
 ```
 
 Now, create two additional vectors that include the ten-day forecast for the high and low temperatures in Celsius. Use a function to create the two new vectors from your existing ones in Fahrenheit.
 
 ```{r}
+Fahrenheit_to_Celsius <-function(X){(X-32)*(5/9)}
 
+LT_Celsius <- Fahrenheit_to_Celsius(LowTemp)
+LT_Celsius
+HT_Celsius <- Fahrenheit_to_Celsius(HighTemp)
+HT_Celsius
 ```
 
 Combine your four vectors into a data frame and add informative column names.
 
 ```{r}
-
+Durham_Temperature1 <- data.frame(LT_Celsius, HT_Celsius, LowTemp, HighTemp)
+Durham_Temperature1
 ```
 
 Use the common functions `summary` and `sd` to obtain basic data summaries of the ten-day forecast. How would you call these functions differently for the entire data frame vs. a single column? Attempt to demonstrate both options below.
 
 ```{r}
+summary(Durham_Temperature1)
 
+sd('Durham_Temperature1')
 ```
 
 ### Date objects
@@ -134,7 +145,7 @@ Remember formatting of dates in R:
 # (code must be uncommented)
 today <- Sys.Date()
 format(today, format = "%B")
-#format(today, format = "")
+format(today, format = "%Y")
 #format(today, format = "")
 #format(today, format = "")
 

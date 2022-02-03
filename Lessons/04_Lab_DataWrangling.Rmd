@@ -82,14 +82,22 @@ NTL.phys.data.processed <-
   mutate(temperature_F = (temperature_C*9/5) + 32)
 
 #Exercise 3: Using a pipe filter NTL.phys.data for Tuesday Lake from 1990 through 1999 only for July 
-
+NTL.phys.data.90.99 <- NTL.phys.data %>%
+  filter(lakename =="Tuesday Lake") %>%
+ filter(year4 %in% c(1990:1999)) %>%
+  filter(month(sampledate) == 7)
+NTL.phys.data.90.99
 
 
 
 
 #Exercise 4: Using the data from part 3, a pipe and the summarise() function find the mean surface temperature (hints: you will need to add another filter for depth==0). Make sure you eliminate NAs before computing the means
 
-  
+NTL.phys.data.90.99.v2 <- NTL.phys.data.90.99 %>% (filter(depth == 0) %>%
+                                                     filter(!is.na(temperature_C))
+                                                   %>% 
+                                                    summarise(mean = mean(temperature_C)))
+
 ```
 
 ## Gather and Spread

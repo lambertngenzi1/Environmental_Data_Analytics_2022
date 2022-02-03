@@ -27,7 +27,7 @@ getwd()
 library(tidyverse)
 #install.packages(lubridate)
 library(lubridate)
-NTL.phys.data <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
+NTL.phys.data <- read.csv("../Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
 
 colnames(NTL.phys.data)
 head(NTL.phys.data)
@@ -73,7 +73,7 @@ Here are the relevant commands used in the `filter` function. Add some notes to 
 `|`
 
 ```{r}
-class(NTL.phys.data$lakeid)
+class(NTL.phys.data$lakeid)  #character is with Quote""
 class(NTL.phys.data$depth)
 
 # matrix filtering
@@ -111,9 +111,19 @@ NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304))
 # filter NTL.phys.data for the year 1999
 # what code do you need to use, based on the class of the variable?
 class(NTL.phys.data$year4)
+NTL.phys.data.year1999 <- filter(NTL.phys.data, year4 ==1999)
+NTL.phys.data.year1999
 
 # Exercise: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
+
+NTL.phys.data.TLake <- filter(NTL.phys.data, lakename ==
+                        "Tuesday Lake") 
+NTL.phys.data.TLake
+
+NTL.phys.data.TLake.1990.1999 <- filter(NTL.phys.data, year4 %in%
+                                          c(1990:1999))
+NTL.phys.data.Tlake.1990.1999
 
 
 ```
