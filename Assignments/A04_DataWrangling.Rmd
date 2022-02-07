@@ -1,8 +1,10 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Lambert Ngenzi"
 output: pdf_document
 geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -20,13 +22,43 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ## Set up your session 
 1. Check your working directory, load the `tidyverse` and `lubridate` packages, and upload all four raw data files associated with the EPA Air dataset. See the README file for the EPA air datasets for more information (especially if you have not worked with air quality data previously). 
+```{r}
+getwd()
+library(tidyverse)
+library(lubridate)
+EPAair_PM25_NC2019 <- read.csv("../Data/Raw/EpAair_PM25_NC2019_raw.csv",
+                               stringsAsFactors = TRUE)
+EPAair_PM25_NC2018 <- read.csv("../Data/Raw/EpAair_PM25_NC2018_raw.csv", 
+                             stringsAsFactors = TRUE)
+EPAair_03_NC2019 <- read.csv("../Data/Raw/EpAair_o3_NC2019_raw.csv",
+                             stringsAsFactors = TRUE)
+EPAair_03_NC2018 <- read.csv("../Data/Raw/EpAair_o3_NC2018_raw.csv",
+                             stringsAsFactors = TRUE)
+
+```
+
 
 2. Explore the dimensions, column names, and structure of the datasets. 
 
 ```{r, message = FALSE}
-#1
+ #1
+dim(EPAair_03_NC2018)
+colnames(EPAair_03_NC2018)
+str(EPAair_03_NC2018)
+ #for EpAair 03 2019
+dim(EPAair_03_NC2019)
+colnames(EPAair_03_NC2019)
+str(EPAair_03_NC2019)
 
 #2
+
+dim(EPAair_PM25_NC2018)
+colnames(EPAair_PM25_NC2018)
+str(EPAair_PM25_NC2018)
+ #For 2019
+dim(EPAair_PM25_NC2019)
+colnames(EPAair_PM25_NC2019)
+str(EPAair_PM25_NC2019)
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -36,14 +68,39 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r}
-#3
+#3 Changing date from factor into date format 
 
+EPAair_03_NC2018$Date <- as.Date(EPAair_03_NC2018$Date,  format = "%m/%d/%Y")
+EPAair_03_NC2019$Date <-  as.Date(EPAair_03_NC2019$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2019$Date <-  as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
 #4
+EPAair_03_NC2018_Selected <- select(EPAair_03_NC2018, Date, DAILY_AQI_VALUE, 
+          Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
+EPAair_03_NC2019_Selected <- select(EPAair_03_NC2019, Date, DAILY_AQI_VALUE,
+          Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPAair_PM25_NC2018_Selected <- select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE, 
+          Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE) 
+
+EPAair_PM25_NC2019_Selected <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE, 
+          Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 #5
+EPAair_PM25_NC2018_Slt_PM2.5 <-mutate(EPAair_PM25_NC2018_Selected, 
+                                     AQS_PARAMETER_DESC = "PM2.5") 
+EPAair_PM25_NC2019_Slt_PM2.5 <-mutate(EPAair_PM25_NC2019_Selected, 
+                                     AQS_PARAMETER_DESC = "PM2.5")
 
 #6
 
+write.csv(EPAair_03_NC2018_Selected, row.names = FALSE,
+          file = "../Data/Processed/EPAair_03_NC2018_Processed.csv")
+write.csv(EPAair_03_NC2019_Selected, row.names = FALSE,
+          file = "../Data/Processed/EPAair_03_NC2019_Processed.csv")
+write.csv(EPAair_PM25_NC2018_Slt_PM2.5, row.names = FALSE,
+          file = "../Data/Processed/EPAair_PM25_NC2018_Processed.csv")
+write.csv(EPAair_PM25_NC2019_Slt_PM2.5, row.names = FALSE,
+          file = "../Data/Processed/EPAair_PM25_NC2019_Processed.csv")
 ```
 
 
@@ -62,15 +119,31 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r}
 #7
+NC_Air_Pol <- rbind(EPAair_03_NC2018_Selected, EPAair_03_NC2019_Selected,
+                  EPAair_PM25_NC2018_Slt_PM2.5, EPAair_PM25_NC2019_Slt_PM2.5)
 
 #8
+NC_Air_Pol_Epa <- NC_Air_Pol %>% 
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory",
+"Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School",
+"Frying Pan Mountain", "West Johnston Co.", "Garinger High School",
+"Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>% 
+   group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>% 
+  summarise(MeanAQI = mean(DAILY_AQI_VALUE), 
+            MeanLAT = mean(SITE_LATITUDE),
+            MeanLONG = mean(SITE_LONGITUDE), .groups = "drop") %>% 
+         mutate(Month = month(Date),
+                Year = year(Date))
 
-#9
+#9 
+Air_Pol_Spread <- pivot_wider(NC_Air_Pol_Epa, names_from = AQS_PARAMETER_DESC, values_from = MeanAQI)
 
 #10
+dim(Air_Pol_Spread)
 
 #11
-
+write.csv(Air_Pol_Spread, row.names = FALSE,
+          file = "../Data/Processed/EPAair_O3_PM25_NC2122_Processed.csv")
 ```
 
 
@@ -84,12 +157,14 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r}
 #12(a,b)
-
-
+Air_Pol_Spread_summary <- Air_Pol_Spread %>% group_by(Site.Name, Month,
+                                                      Year) %>% 
+  summarise(Ozone = mean(Ozone),
+            PM2.5 = mean(PM2.5)) %>% 
+            filter(!is.na(Ozone) | !is.na(PM2.5))
 #13
+dim(Air_Pol_Spread_summary)
 
 ```
 
-14. Why did we use the function `drop_na` rather than `na.omit`?
-
-> Answer: 
+ 
