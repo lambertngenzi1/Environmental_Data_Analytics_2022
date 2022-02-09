@@ -21,7 +21,7 @@ Effective data visualization depends on purposeful choices about graph types. Th
 ```{r, message = FALSE, warning = FALSE}
 getwd()
 library(tidyverse)
-#install.packages("ggridges")
+install.packages("ggridges")
 library(ggridges)
 
 PeterPaul.chem.nutrients <- 
@@ -78,7 +78,7 @@ Here are some commonly used aesthetic types that can be manipulated in ggplot:
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
 # Scatterplot
-ggplot(EPAair, aes(x = Date, y = Ozone)) + 
+ggplot(EPAair, aes(x = Date, y = Ozone)) + ##As to be dataframe, not vector or matrix
   geom_point()
 
 O3plot <- ggplot(EPAair) +

@@ -41,7 +41,7 @@ library(colormap)
 
 PeterPaul.chem.nutrients <- 
   read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
-EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
+EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC2122_Processed.csv", stringsAsFactors = TRUE)
 
 EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
@@ -57,7 +57,13 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 
 # 1. 
 # Plot surface temperatures by day of  year. 
+
+PeterPaulPlot2 <- ggplot(subset(PeterPaul.chem.nutrients), aes(daynum, temperature_C)) + geom_point(aes(color= depth)) + (size = 0.5) + ylab("surface in Temperature") + scale_color_viridis(option = "magma", direction = -1)
++ scale_x_date(date_breaks = "5 years", date_labels = xy)
+plot(PeterPaulPlot1)
+
 # Color your points by year, and facet by lake in two rows.
+
 # Change the ylab name
 
 
@@ -67,7 +73,8 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
 
-
+PeterPaulPlot2 <- ggplot(PeterPaul.chem.nutrients, depth==0), aes(sampledate, temperature_C) + geom_point(aes(color= magma)) + facet_wrap(vars(lakename), nrow = 2) + ylab("surface in Temperature")
+plot(PeterPaulPlot2)
 
 
 ```

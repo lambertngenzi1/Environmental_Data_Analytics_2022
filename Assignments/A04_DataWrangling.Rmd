@@ -26,6 +26,8 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 getwd()
 library(tidyverse)
 library(lubridate)
+
+# uploading all 4 csv data files 
 EPAair_PM25_NC2019 <- read.csv("../Data/Raw/EpAair_PM25_NC2019_raw.csv",
                                stringsAsFactors = TRUE)
 EPAair_PM25_NC2018 <- read.csv("../Data/Raw/EpAair_PM25_NC2018_raw.csv", 
@@ -41,21 +43,20 @@ EPAair_03_NC2018 <- read.csv("../Data/Raw/EpAair_o3_NC2018_raw.csv",
 2. Explore the dimensions, column names, and structure of the datasets. 
 
 ```{r, message = FALSE}
- #1
+ # For Oznone 3 in 2018
 dim(EPAair_03_NC2018)
 colnames(EPAair_03_NC2018)
 str(EPAair_03_NC2018)
- #for EpAair 03 2019
+ #For ozone 03 in 2019
 dim(EPAair_03_NC2019)
 colnames(EPAair_03_NC2019)
 str(EPAair_03_NC2019)
 
-#2
-
+# For Pm2.5 in 2018
 dim(EPAair_PM25_NC2018)
 colnames(EPAair_PM25_NC2018)
 str(EPAair_PM25_NC2018)
- #For 2019
+ #For PM2.5 in 2019
 dim(EPAair_PM25_NC2019)
 colnames(EPAair_PM25_NC2019)
 str(EPAair_PM25_NC2019)
@@ -68,13 +69,18 @@ str(EPAair_PM25_NC2019)
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r}
-#3 Changing date from factor into date format 
+#3 Changing date from factor into date format for 4 datasets
 
 EPAair_03_NC2018$Date <- as.Date(EPAair_03_NC2018$Date,  format = "%m/%d/%Y")
+class(EPAair_03_NC2018$Date)
 EPAair_03_NC2019$Date <-  as.Date(EPAair_03_NC2019$Date, format = "%m/%d/%Y")
+class(EPAair_03_NC2019$Date)
 EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y")
+class(EPAair_PM25_NC2018$Date)
 EPAair_PM25_NC2019$Date <-  as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
-#4
+class(EPAair_PM25_NC2019$Date)
+
+#4 Selecting specific columns in each dataset
 EPAair_03_NC2018_Selected <- select(EPAair_03_NC2018, Date, DAILY_AQI_VALUE, 
           Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
@@ -85,13 +91,13 @@ EPAair_PM25_NC2018_Selected <- select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE,
 
 EPAair_PM25_NC2019_Selected <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE, 
           Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
-#5
+#5 Filling AQS with PM2.5 using mutate function
 EPAair_PM25_NC2018_Slt_PM2.5 <-mutate(EPAair_PM25_NC2018_Selected, 
-                                     AQS_PARAMETER_DESC = "PM2.5") 
+                                     AQS_PARAMETER_DESC = "PM2.5")
 EPAair_PM25_NC2019_Slt_PM2.5 <-mutate(EPAair_PM25_NC2019_Selected, 
                                      AQS_PARAMETER_DESC = "PM2.5")
 
-#6
+#6 Saving the four datasets in my local computer
 
 write.csv(EPAair_03_NC2018_Selected, row.names = FALSE,
           file = "../Data/Processed/EPAair_03_NC2018_Processed.csv")
@@ -118,11 +124,11 @@ write.csv(EPAair_PM25_NC2019_Slt_PM2.5, row.names = FALSE,
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC2122_Processed.csv"
 
 ```{r}
-#7
+#7 Using Rbind function to combine the four datasets in one 
 NC_Air_Pol <- rbind(EPAair_03_NC2018_Selected, EPAair_03_NC2019_Selected,
                   EPAair_PM25_NC2018_Slt_PM2.5, EPAair_PM25_NC2019_Slt_PM2.5)
 
-#8
+#8 Organizing the combined dataset in 7 
 NC_Air_Pol_Epa <- NC_Air_Pol %>% 
   filter(Site.Name %in% c("Linville Falls", "Durham Armory",
 "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School",
@@ -134,14 +140,15 @@ NC_Air_Pol_Epa <- NC_Air_Pol %>%
             MeanLONG = mean(SITE_LONGITUDE), .groups = "drop") %>% 
          mutate(Month = month(Date),
                 Year = year(Date))
+dim(NC_Air_Pol_Epa)
 
-#9 
+#9 Spreading previous dataset 
 Air_Pol_Spread <- pivot_wider(NC_Air_Pol_Epa, names_from = AQS_PARAMETER_DESC, values_from = MeanAQI)
 
-#10
+#10 checking the dimension of the created spreaded dataset
 dim(Air_Pol_Spread)
 
-#11
+#11 saving the csv in my local computer 
 write.csv(Air_Pol_Spread, row.names = FALSE,
           file = "../Data/Processed/EPAair_O3_PM25_NC2122_Processed.csv")
 ```
@@ -155,14 +162,14 @@ write.csv(Air_Pol_Spread, row.names = FALSE,
 13. Call up the dimensions of the summary dataset.
 
 
-```{r}
-#12(a,b)
+```{r} 
+#12(a,b) Generating summary of data with AQI and PM2.5 values 
 Air_Pol_Spread_summary <- Air_Pol_Spread %>% group_by(Site.Name, Month,
                                                       Year) %>% 
   summarise(Ozone = mean(Ozone),
             PM2.5 = mean(PM2.5)) %>% 
             filter(!is.na(Ozone) | !is.na(PM2.5))
-#13
+#13 Finding values of the previous dataset
 dim(Air_Pol_Spread_summary)
 
 ```
