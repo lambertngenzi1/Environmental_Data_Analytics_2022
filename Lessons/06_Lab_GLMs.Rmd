@@ -194,7 +194,8 @@ summary(Pm2.5_lm)
 PM2.5_Ozone_Plot <- ggplot(EPAair, aes(PM2.5, Ozone)) +
   geom_point() +
   geom_smooth(method = lm)
-print(PM2.5_Ozone_Plot)
+print(PM2.5_Ozone_Plot) +
+  xlim(0, 100)
 
 
 ```
@@ -208,7 +209,7 @@ What other variables can we add to improve model?
 
 #Exercise 5: Build correlation plots and identify more possible explanatory variables to add to the regression.
 
-
+EPAair <- lm(data = Epair, PM2.5 ~ Ozone 
 
 
 #Exercise 6: Choose a model by AIC in a Stepwise Algorithm. Do the results from AIC match the variables you selected on Exercise 5?
