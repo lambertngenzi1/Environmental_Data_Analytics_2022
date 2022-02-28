@@ -1,6 +1,6 @@
 ---
 title: "Assignment 6: GLMs (Linear Regressios, ANOVA, & t-tests)"
-author: "Student Name"
+author: "Lambert Ngenzi"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -27,10 +27,19 @@ The completed exercise is due on Monday, February 28 at 7:00 pm.
 
 ```{r setup}
 #1
+getwd()
+library(tidyverse)
+library(agricolae)
+library(lubridate)
 
-
+NTL_LTER_Raw <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
+NTL_LTER_Raw$sampledate <- as.Date(NTL_LTER_Raw$sampledate, format = "%m/%d/%y")
+class(NTL_LTER_Raw$sampledate)
 #2
-
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
 
 ```
 
@@ -39,8 +48,8 @@ Our first research question is: Does mean lake temperature recorded during July 
 
 3. State the null and alternative hypotheses for this question:
 > Answer:
-H0: 
-Ha: 
+H0: Lake Temperature recorded during July does not change with depth across all lakes 
+Ha: Lake Temerature recorded during July change with depth across all lkes
 
 
 4.  Wrangle your NTL-LTER dataset with a pipe function so that the records meet the following criteria: 
@@ -52,9 +61,19 @@ Ha:
 
 ```{r scatterplot}
 #4
-
+Wrangled_NTL_LTER_Raw <- NTL_LTER_Raw %>% 
+ mutate(Month = month(sampledate)) %>% 
+  filter(Month == "7") %>% 
+  select("lakename", "year4", "daynum", "depth", "temperature_C") %>% 
+  drop_na()
 
 #5
+ggplot(Wrangled_NTL_LTER_Raw, aes(depth, temperature_C)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ylim(0,35) +
+  ylab("Temp(Celsius)") +
+  xlab("Depth(meter)") 
 
 
 ```
@@ -62,21 +81,26 @@ Ha:
 
 6. Interpret the figure. What does it suggest with regards to the response of temperature to depth? Do the distribution of points suggest about anything about the linearity of this trend?
 
-> Answer: 
+> Answer: As depth increases, temperature decreases, the deeper you move down
+into the lake, the colder it gets. 
 
 
 7. Perform a linear regression to test the relationship and display the results
 
 ```{r linear.regression}
 #7
-
-
+Lm_relat <- lm(data = Wrangled_NTL_LTER_Raw, temperature_C ~ depth)
+summary(Lm_relat)
 ```
 
 
 8. Interpret your model results in words. Include how much of the variability in temperature is explained by changes in depth, the degrees of freedom on which this finding is based, and the statistical significance of the result. Also mention how much temperature is predicted to change for every 1m change in depth. 
 
-> Answer:
+> Answer: R-square is 74%, meaning that 74% of temperature is explained by depth
+ based on the 9726 degree of freedom 
+the P-value is less than 0.5, then we would consider the interaction among 
+temperature_C and depth are are statistical significant.
+For every 1m change in depth, temperature is estimated to drop by -1.96m 
 
 
 ---
@@ -91,17 +115,26 @@ Let's tackle a similar question from a different approach. Here, we want to expl
 
 ```{r temperature.model}
 #9
+Temp_AIC <- lm(data = Wrangled_NTL_LTER_Raw, temperature_C ~ year4 +
+                 daynum + depth)
+step(Temp_AIC)
+
+summary(Temp_AIC)
 
 
+#10 After running the AIC model, the recommended call did not change from previous 
 
-#10
-
-
+Multi_Rec_Var <- lm(data = Wrangled_NTL_LTER_Raw, temperature_C ~ year4 + daynum + depth)
+summary(Multi_Rec_Var)
 ```
 
 11. What is the final set of explanatory variables that the AIC method suggests we use to predict temperature in our multiple regression? How much of the observed variance does this model explain? Is this an improvement over the model using only depth as the explanatory variable?
 
-> Answer: 
+> Answer: All the given variables were the suggested (year4, daynum, depth) to 
+predict temperature
+The observed variance is explained by only 74% 
+Only a slight improvement over the model, this suggests that depth is the mostly 
+important factor. 
 
 
 
@@ -112,13 +145,20 @@ Let's tackle a similar question from a different approach. Here, we want to expl
 
 ```{r anova.model}
 #12
+Temp_07_AOV <- aov(data = Wrangled_NTL_LTER_Raw, temperature_C ~ lakename)
+summary(Temp_07_AOV)
 
+Temp_07_lm <- lm(data = Wrangled_NTL_LTER_Raw, temperature_C ~ lakename)
+summary(Temp_07_lm)
 
 ```
 
 13. Is there a significant difference in mean temperature among the lakes? Report your findings. 
 
-> Answer: 
+> Answer: The Anova model shows that mean temperature among the lakes are statistically
+signicant or different with p-value less than 0.5 with 8 degree of freedom while 
+the linear model shows how statistically different each lake is with their 
+specific p-values differ. 
 
 
 
@@ -126,7 +166,12 @@ Let's tackle a similar question from a different approach. Here, we want to expl
 
 ```{r scatterplot.2}
 #14.
-
+ggplot(Wrangled_NTL_LTER_Raw) + 
+  aes(depth, temperature_C, color = lakename) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = lm, se = FALSE) +
+  ylim(0, 35) +
+ labs(y = expression("Temperature "(degree*C)), x = "Depth (m)")
 
 ```
 
@@ -134,18 +179,21 @@ Let's tackle a similar question from a different approach. Here, we want to expl
 
 ```{r tukey.test}
 #15
-
-
+TukeyHSD(Temp_07_AOV)
+Extra_Plot <- HSD.test(Temp_07_AOV, "lakename", group = TRUE)
+Extra_Plot
 ```
 
 16.From the findings above, which lakes have the same mean temperature, statistically speaking, as Peter Lake? Does any lake have a mean temperature that is statistically distinct from all the other lakes?
 
->Answer:
+>Answer: Only 2 Lakes: Ward, and Paul, have the same mean temperature
+statistically speaking, and 
+None of the lakes have a statistically distinct mean temperature than other lakes
 
  
 
 17. If we were just looking at Peter Lake and Paul Lake. What's another test we might explore to see whether they have distinct mean temperatures? 
 
->Answer: 
+>Answer: We would look Two-sample t-test
 
 
