@@ -19,13 +19,14 @@ editor_options:
 
 library(tidyverse)
 library(lubridate)
-#install.packages("trend")
+library(cowplot)
+install.packages("trend")
 library(trend)
-#install.packages("zoo")
+install.packages("zoo")
 library(zoo)
-#install.packages("Kendall")
+install.packages("Kendall")
 library(Kendall)
-#install.packages("tseries")
+install.packages("tseries")
 library(tseries)
 
 # Set theme
@@ -56,8 +57,8 @@ Temp_BR <- read.csv("./Data/Raw/tas_1901_2016_BRA.csv", stringsAsFactors = TRUE)
 Rainfall_BR_processed <-
   Rainfall_BR %>% 
   rename( Rainfall = Rainfall....MM.) %>% 
-  separate(Statistics,c("Null","Month","Null2")," ") %>% 
-  mutate( Date = my(paste0(Month,"-",Year))) %>% 
+  separate(Statistics,c("Null","Month","Null2")," ") %>% # Seperate fct seperate in two 
+  mutate( Date = my(paste0(Month,"-",Year))) %>%   #pasting all the stuffs together 
   select(Date,Rainfall)
 
 #Exercise 3: Repeat exercise 2 to the temperature dataset.
@@ -82,14 +83,20 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 #Exercise 5: Check if there is any missing data for both temperature and rainfall series.
 
-
-
+summary(BRA_complete)
 
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
 
+Rainfall_Plot <- ggplot(BRA_complete, aes(Date, Rainfall)) +
+  geom_line() +
+  geom_smooth(method = lm)
 
+Temp_Plot <- ggplot(BRA_complete, aes(Date, Temperature_C)) +
+  geom_line() +
+  geom_smooth(method = lm)
 
-
+Plot_2 <- plot_grid(Rainfall_Plot, Temp_Plot, ncol = 1)
+print(Plot_2)
 
 
 ```
@@ -98,9 +105,11 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 ```{r}
 #Exercise 7: Create a time series objects for each series using ts(). Make sure you specify the starting point and frequency.
+BRA_complete_ts_R <- ts(BRA_complete$Rainfall, start=c(1, 1901),
+                   frequency=12)
 
-
-
+BRA_complete_ts_T <- ts(BRA_complete$Temperature_C, start=c(1, 1901),
+                   frequency=12)
 ```
 
 
@@ -121,16 +130,18 @@ The `stl` function decomposes the time series object into its component parts. W
 # Exercise 8: Use the stl() function to decompose both series. 
 # Visualize the decomposed series using plot(). What components can you identify?
 
+BRA_R_dec <- stl(BRA_complete_ts_R, s.window = "periodic")
 
 
-
-
+BRA_T_dec <- stl(BRA_complete_ts_T,s.window = "periodic")
+plot(BRA_R_dec)
+plot(BRA_T_dec)
 
 # Exercise 9: Use the times series object generated with the stl() to extract the 
 # components of each series and turn them into data frames.
 
 
-
+Br_Component <- 
 
 
 

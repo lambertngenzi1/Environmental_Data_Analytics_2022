@@ -208,7 +208,8 @@ Specific test for stochastic trend analysis:
 
 * **Augmented Dickey Fuller**: no seasonality, non-parametric, missing data not allowed. Function: `adf.test()` (package: tseries)
 
-
+##determinist: more constant trend over time
+##Stochastic it changes over time 
 #### Example: monotonic trend analysis
 
 Let's refer to our wind speed data. We already performed interpolation, but we still need to create our time series object and decompose the series to find out which stationarity test we can apply. 
@@ -260,7 +261,8 @@ What would we conclude based on these findings?
 
 ## Forecasting with Autoregressive and Moving Average Models (ARMA)
 
-We might be interested in characterizing a time series in order to understand what happened in the past and to effectively forecast into the future. Two common models that can approximate time series are **autoregressive** and **moving average** models. To classify these models, we use the  **ACF (autocorrelation function)** and the **PACF (partial autocorrelation function)**, which correspond to the autocorrelation of a series and the correlation of the residuals, respectively. 
+We might be interested in characterizing a time series in order to understand what happened in the past and to effectively forecast into the future. Two common models that can approximate time series are **autoregressive** and **moving average** models. To classify these models, we use the  **ACF (autocorrelation function)** and the **PACF (partial autocorrelation function)**, which correspond to the autocorrelation of a series and the correlation of the residuals, respectively, LN (not as simple to calculte as autocorrelation. LN: Correlation is how related  of 2 variables 
+
 
 **Autoregressive** models operate under the framework that a given measurements is correlated with  previous measurements. For example, an AR1 formulation dictates that a measurement is dependent on the previous measurement, and the value can be predicted by quantifying the lag. 
 
