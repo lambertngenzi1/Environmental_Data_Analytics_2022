@@ -82,7 +82,7 @@ ggplot(Wrangled_NTL_LTER_Raw, aes(depth, temperature_C)) +
 6. Interpret the figure. What does it suggest with regards to the response of temperature to depth? Do the distribution of points suggest about anything about the linearity of this trend?
 
 > Answer: As depth increases, temperature decreases, the deeper you move down
-into the lake, the colder it gets. 
+into the lake, the colder it gets and vicer versa. The trends  exhibitss a negative correlation. 
 
 
 7. Perform a linear regression to test the relationship and display the results
@@ -96,11 +96,11 @@ summary(Lm_relat)
 
 8. Interpret your model results in words. Include how much of the variability in temperature is explained by changes in depth, the degrees of freedom on which this finding is based, and the statistical significance of the result. Also mention how much temperature is predicted to change for every 1m change in depth. 
 
-> Answer: R-square is 74%, meaning that 74% of temperature is explained by depth
- based on the 9726 degree of freedom 
-the P-value is less than 0.5, then we would consider the interaction among 
-temperature_C and depth are are statistical significant.
-For every 1m change in depth, temperature is estimated to drop by -1.96m 
+> Answer: The R-square is about 74%, meaning that 74% of temperature is explained by depth
+ based on the 9726 degree of freedom with a 
+the P-value less than 0.5, then we would consider the interaction among 
+temperature_C and depth to be statistically significant.
+For every 1m change in depth, temperature is estimated to drop by -1.94 degree celsius  
 
 
 ---
@@ -130,11 +130,11 @@ summary(Multi_Rec_Var)
 
 11. What is the final set of explanatory variables that the AIC method suggests we use to predict temperature in our multiple regression? How much of the observed variance does this model explain? Is this an improvement over the model using only depth as the explanatory variable?
 
-> Answer: All the given variables were the suggested (year4, daynum, depth) to 
-predict temperature
+> Answer: All the given variables were suggested (year4, daynum, depth) to 
+predict temperature in our multiple regression
 The observed variance is explained by only 74% 
-Only a slight improvement over the model, this suggests that depth is the mostly 
-important factor. 
+Only a slight but negligeable  improvement over the model, this suggests that depth is the most 
+important variable. 
 
 
 
@@ -155,10 +155,9 @@ summary(Temp_07_lm)
 
 13. Is there a significant difference in mean temperature among the lakes? Report your findings. 
 
-> Answer: The Anova model shows that mean temperature among the lakes are statistically
+> Answer: The Anova model shows that mean temperature among all the lakes to be statistically
 signicant or different with p-value less than 0.5 with 8 degree of freedom while 
-the linear model shows how statistically different each lake is with their 
-specific p-values differ. 
+the linear model shows how statistically different every single lake is by providing a their specific p-values. 
 
 
 
