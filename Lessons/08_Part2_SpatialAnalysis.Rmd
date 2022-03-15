@@ -117,10 +117,10 @@ mapView(counties_sf, zcol = "AWATER")
 
 ```{r read HUCs shapefile}
 #Read the shapefile into an sf dataframe named "huc8_sf"
-
+NC_HUC8 <- st_read("./Data/Spatial/NCHUC8.shp")
 
 #Reveal the columns
-
+col(NC_HUC8)
 
 #Check the CRS
 
@@ -130,7 +130,9 @@ mapView(counties_sf, zcol = "AWATER")
 
 #View the data as a map, colored by the acreage in each
 
+mapView(NC_HUC8, zcol = "ACRES")
 
+ggplot() + geom_sf(data = NC_HUC8, aes(fill = ACRES))
 ```
 
 ### 2.2.3 Challenge!
@@ -143,7 +145,6 @@ mapView(counties_sf, zcol = "AWATER")
 
 
 #Create a map
-
 
 ```
 

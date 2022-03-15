@@ -1,6 +1,6 @@
 ---
 title: "Assignment 7: Time Series Analysis"
-author: "Student Name"
+author: "Lambert Ngenzi"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -29,6 +29,21 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r}
 #1
+getwd()
+library(tidyverse)
+library(lubridate)
+library(zoo)
+library(trend)
+library(plyr)
+library(Kendall)
+library(tseries)
+
+
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
+
 
 ```
 
@@ -37,7 +52,12 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r, message = FALSE}
 #2
+Ozone_TimeSeries = list.files("./Data/Raw/Ozone_TimeSeries/", pattern = "*csv", full.names = TRUE)
 
+GaringerOzone <- Ozone_TimeSeries %>%
+  ldply(read.csv)
+
+#ldply()
 
 ```
 
@@ -53,12 +73,23 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r}
 # 3
-
+GaringerOzone$Date <- as.Date(GaringerOzone$Date, format = "%m/%d/%Y")
+class(GaringerOzone$Date)
 # 4
-
+Wrangled_GO <- GaringerOzone %>% 
+  select(Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
+min(Wrangled_GO$Date)
+max(Wrangled_GO$Date)
 # 5
 
+Days <- as.data.frame(seq(as.Date("2010-01-01"), as.Date("2019-12-31"), by = 1))
+
+
+names(Days)[1] <- 'Date'
+
 # 6
+GaringerOzone <- left_join(Days, Wrangled_GO)
+dim(GaringerOzone)
 
 ```
 
@@ -68,10 +99,13 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r}
 #7
-
+ggplot(GaringerOzone, aes(Date, Daily.Max.8.hour.Ozone.Concentration)) +
+  geom_line() +
+  geom_smooth(method = "lm") +
+  ylab("Ozone Concentration (ppm)")
 ```
 
->Answer: 
+>Answer: There is a slight negative trend over time of Ozone Concentration (ppm)
 
 ## Time Series Analysis
 
@@ -81,16 +115,33 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
+summary(GaringerOzone$Daily.Max.8.hour.Ozone.Concentration)
+
+GaringerOzone$Daily.Max.8.hour.Ozone.Concentration <- 
+  zoo::na.approx(GaringerOzone$Daily.Max.8.hour.Ozone.Concentration)
+summary(GaringerOzone$Daily.Max.8.hour.Ozone.Concentration)
 
 ```
 
-> Answer:  
+> Answer: ?Just because the gap that makes up more than 1/3 of the sampling period is generally considered the threshold for considering a gap to be too long, therefore, a step trend analysis is better in this situation)
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
 #9
+GaringerOzone.monthly <- GaringerOzone %>% 
+  mutate(Year = year(Date)) %>% 
+ mutate(Month = month(Date)) %>% 
+  group_by(Year, Month) %>% 
+ dplyr::summarise(OzoneMeanCon = mean(Daily.Max.8.hour.Ozone.Concentration))
+
+GaringerOzone.monthly$MY <- as.yearmon(paste(GaringerOzone.monthly$Year, 
+                                             GaringerOzone.monthly$Month), "%Y %m")
+
+GaringerOzone.monthly$MY <- as.Date(GaringerOzone.monthly$MY, format = "%m-%Y")
+
+  
 
 ```
 
@@ -99,7 +150,9 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #10
+GaringerOzone.daily.ts <- ts(GaringerOzone$Daily.Max.8.hour.Ozone.Concentration, start = c(2010,1), frequency = 365)
 
+GaringerOzone.monthly.ts <- ts(GaringerOzone.monthly$OzoneMeanCon, start = c(2010,1), frequency = 12)
 
 ```
 
@@ -108,6 +161,12 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #11
+Garinger.Daily.ts.Dec <- stl(GaringerOzone.daily.ts, s.window = "periodic")
+
+Garinger.monthly.ts.Dec <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
+
+plot(Garinger.Daily.ts.Dec)
+plot(Garinger.monthly.ts.Dec)
 
 
 ```
@@ -118,24 +177,31 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 ```{r}
 #12
 
+Garinger.monthly.ts.mk <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
+summary(Garinger.monthly.ts.mk)
 
 
 ```
 
-> Answer:  
+> Answer:  Due to the seasonality trend 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
 # 13
 
-
+ggplot(GaringerOzone.monthly, aes(MY, OzoneMeanCon)) +
+  geom_point() +
+  geom_line() +
+  geom_smooth( method = "lm") +
+  xlab("Date") +
+  ylab("Mean Ozone Con (PPM)")
 
 ```
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: Overall, the Ozone mean concenreation over the entire data from 2010 to 2020 has not changed much with a slight a negative monotonic trend. Although it shows a strong seasonal trend. With the seasonal mean kendall, our 2 sided p value is equal 0.0467, it is statiscally significant.
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -143,9 +209,16 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #15
+view(GaringerOzone.monthly.ts)
+
+GaringerOzone.Subs <- as.data.frame(Garinger.monthly.ts.Dec$time.series[,2:3])
 
 #16
 
+GaringerOzone.subs.nmk <- MannKendall(GaringerOzone.Subs) 
+summary(GaringerOzone.subs.nmk)
+
 ```
 
-> Answer: 
+> Answer: Reject the null hypotesis, stronger tendency of decrease 
+We have a trend. The difference is much greater (score of -16300 and p-value smaller than the Seasonal Mann Kendal)
