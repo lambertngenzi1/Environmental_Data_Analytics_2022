@@ -8,39 +8,42 @@ library(tidyverse)
 # Specify the date column as a date
 # Remove negative values for depth_id 
 # Include only lakename and sampledate through po4 columns
-nutrient_data <- 
-nutrient_data$sampledate <- as.Date()
-nutrient_data <-  %>%
-   %>%
+
+nutrient_data <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
+nutrient_data$sampledate <- as.Date(nutrient_data$sampledate,
+                                    format = "%Y-%m-%d")
+nutrient_data <- nutrient_data %>%
+  filter(depth_id > 0) %>%
+  select(lakename, sampledate:po4)
   
 
 #### Define UI ----
 ui <- fluidPage(theme = shinytheme("yeti"),
   # Choose a title
-  titlePanel(),
+  titlePanel("Lake Nutrient Peter and Paul"),
   sidebarLayout(
     sidebarPanel(
       
       # Select nutrient to plot
-      selectInput(inputId = ,
-                  label = ,
-                  choices = , 
-                  selected = ),
+      selectInput(inputId = "y" ,
+                  label = "Nutrient" ,
+                  choices = c("tn_ug", "tn_ug", "nh34", "no23", "po4"),
+                  selected = "tp_ug"),
       
       # Select depth
-      checkboxGroupInput(inputId = ,
-                         label = ,
-                         choices = ,
+      checkboxGroupInput(inputId = "y" ,
+                         label = "depth" ,
+                         choices = c() ,
                          selected = ,
       
       # Select lake
-      checkboxGroupInput(inputId = ,
-                         label = ,
+      checkboxGroupInput(inputId = "y",
+                         label = "lakename",
                          choices = ,
                          selected = ,
 
       # Select date range to be plotted
-      sliderInput(inputId = ,
+      sliderInput(inputId = "y" ,
                   label = ,
                   min = ,
                   max = ,
@@ -70,7 +73,7 @@ server <- function(input, output) {
     
     # Create a ggplot object for the type of plot you have defined in the UI  
        output$scatterplot <- renderPlot({
-        ggplot( ,#dataset
+        ggplot( ,nutrient_data
                aes_string(x = , y = , 
                           fill = , shape = )) +
           geom_point() +
